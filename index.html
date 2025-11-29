@@ -43,67 +43,45 @@
         <p>Move mouse to interact</p>
     </div>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-            }
-        }
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 
-    <script type="module">
-        import * as THREE from 'three';
-
-        // 1. SCENE SETUP
+    <script>
+        // Now we can access THREE globally
         const scene = new THREE.Scene();
-        // Add a subtle fog to give depth
         scene.fog = new THREE.FogExp2(0x000000, 0.001);
 
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 30;
+        camera.position.z = 30; // Moved camera back slightly to ensure visibility
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Optimize for retina
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // 2. CREATE PARTICLES
+        // --- PARTICLE LOGIC ---
         const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 7000; // Total stars
+        const particlesCount = 5000; 
 
-        const posArray = new Float32Array(particlesCount * 3); // x, y, z
-        const colorArray = new Float32Array(particlesCount * 3); // r, g, b
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorArray = new Float32Array(particlesCount * 3);
 
-        // Math colors
         const color1 = new THREE.Color(0x00c6ff); // Cyan
-        const color2 = new THREE.Color(0xff00ff); // Magenta
+        const color2 = new THREE.Color(0xff00ff); // Purple
 
         for (let i = 0; i < particlesCount * 3; i+=3) {
-            // Create a spiral shape mathematically
-            // i is index, we want a value roughly 0 to count
+            // Math to create the spiral shape
             const i3 = i / 3;
-            
-            // Radius expands further out
-            const radius = Math.random() * 20 + Math.random() * 10;
-            
-            // Spin angle (theta)
-            const spin = i3 * 0.01; 
-            
-            // Random scatter for volume
-            const scatter = (Math.random() - 0.5) * 5;
+            const radius = Math.random() * 20 + Math.random() * 5; // Distance from center
+            const spin = i3 * 0.02; // Angle
+            const scatter = (Math.random() - 0.5) * 3; // Random messiness
 
-            // Simple Spiral Logic
-            // x = r * cos(theta)
-            // y = r * sin(theta)
-            // z = depth
-            
-            posArray[i] = (radius + scatter) * Math.cos(spin + scatter);     // x
-            posArray[i+1] = (Math.random() - 0.5) * 15;                      // y (height randomness)
-            posArray[i+2] = (radius + scatter) * Math.sin(spin + scatter);   // z
+            // Polar coordinates to Cartesian
+            posArray[i] = (radius + scatter) * Math.cos(spin);             // X
+            posArray[i+1] = (Math.random() - 0.5) * 10;                    // Y (Height)
+            posArray[i+2] = (radius + scatter) * Math.sin(spin);           // Z
 
-            // Mix colors based on position
+            // Colors
             const mixedColor = color1.clone().lerp(color2, Math.random());
-            
             colorArray[i] = mixedColor.r;
             colorArray[i+1] = mixedColor.g;
             colorArray[i+2] = mixedColor.b;
@@ -112,65 +90,5 @@
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
 
-        // Create the material
         const material = new THREE.PointsMaterial({
-            size: 0.15,
-            vertexColors: true, // Enable per-particle coloring
-            blending: THREE.AdditiveBlending, // Makes overlapping particles glow
-            transparent: true,
-            opacity: 0.8,
-            depthWrite: false
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, material);
-        scene.add(particlesMesh);
-
-        // 3. INTERACTIVITY
-        let mouseX = 0;
-        let mouseY = 0;
-        let targetX = 0;
-        let targetY = 0;
-
-        const windowHalfX = window.innerWidth / 2;
-        const windowHalfY = window.innerHeight / 2;
-
-        document.addEventListener('mousemove', (event) => {
-            mouseX = (event.clientX - windowHalfX);
-            mouseY = (event.clientY - windowHalfY);
-        });
-
-        // Resize handler
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // 4. ANIMATION LOOP
-        const clock = new THREE.Clock();
-
-        const tick = () => {
-            const elapsedTime = clock.getElapsedTime();
-
-            // Smooth mouse movement (Lerp)
-            targetX = mouseX * 0.001;
-            targetY = mouseY * 0.001;
-
-            // Rotate the whole galaxy
-            particlesMesh.rotation.y = elapsedTime * 0.1; 
-            particlesMesh.rotation.x += 0.05 * (targetY - particlesMesh.rotation.x);
-            particlesMesh.rotation.y += 0.05 * (targetX - particlesMesh.rotation.y);
-
-            // Pulse effect: Modify geometry slightly
-            // Note: Mutating geometry every frame is expensive, 
-            // but for simple waves it's okay on modern GPUs.
-            // For complex stuff, use Vertex Shaders.
-            
-            renderer.render(scene, camera);
-            window.requestAnimationFrame(tick);
-        };
-
-        tick();
-    </script>
-</body>
-</html>
+            size: 0.2, // Slightly larger particles
