@@ -370,4 +370,31 @@
         }
 
         function onWindowResize() {
-            camera.aspect
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function onMouseMove(event) {
+            // Logic chuột không cần đổi vì canvas position: fixed
+            uniforms.uMouse.value.x = (event.clientX / window.innerWidth) * 2 - 1;
+            uniforms.uMouse.value.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const elapsedTime = clock.getElapsedTime();
+            uniforms.uTime.value = elapsedTime;
+            
+            // Xoay nhẹ theo thời gian
+            particleSystem.rotation.y = elapsedTime * 0.05;
+            
+            renderer.render(scene, camera);
+        }
+
+        init();
+        animate();
+    </script>
+</body>
+</html>
