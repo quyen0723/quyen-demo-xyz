@@ -3,92 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Cyber Spiral</title>
+    <title>Lite Vortex</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        canvas {
-            display: block;
-        }
-        #overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            pointer-events: none;
-            z-index: 10;
-        }
+        body { margin: 0; background: #000; overflow: hidden; }
         h1 {
-            font-size: 1.2rem;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            background: -webkit-linear-gradient(#00c6ff, #0072ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p {
-            font-size: 0.8rem;
+            position: absolute; top: 20px; left: 20px;
+            color: cyan; font-family: monospace; z-index: 10;
         }
     </style>
 </head>
 <body>
-
-    <div id="overlay">
-        <h1>Neural Vortex</h1>
-        <p>Move mouse to interact</p>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <h1>CPU MODE: ON</h1>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        // Now we can access THREE globally
-        const scene = new THREE.Scene();
-        scene.fog = new THREE.FogExp2(0x000000, 0.001);
-
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 30; // Moved camera back slightly to ensure visibility
-
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        // Cấu hình Renderer NHẸ NHẤT có thể
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: false, // Tắt làm mịn để đỡ lag
+            powerPreference: "high-performance",
+            precision: "lowp" // Giảm độ chính xác để tính toán nhanh hơn
+        });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         document.body.appendChild(renderer.domElement);
 
-        // --- PARTICLE LOGIC ---
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 5000; 
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 25;
 
-        const posArray = new Float32Array(particlesCount * 3);
-        const colorArray = new Float32Array(particlesCount * 3);
+        // Giảm số lượng hạt xuống 1500 (thay vì 5000)
+        const count = 1500; 
+        const geometry = new THREE.BufferGeometry();
+        const positions = [];
+        const colors = [];
 
-        const color1 = new THREE.Color(0x00c6ff); // Cyan
-        const color2 = new THREE.Color(0xff00ff); // Purple
+        const color1 = new THREE.Color("cyan");
+        const color2 = new THREE.Color("purple");
 
-        for (let i = 0; i < particlesCount * 3; i+=3) {
-            // Math to create the spiral shape
-            const i3 = i / 3;
-            const radius = Math.random() * 20 + Math.random() * 5; // Distance from center
-            const spin = i3 * 0.02; // Angle
-            const scatter = (Math.random() - 0.5) * 3; // Random messiness
+        for(let i = 0; i < count; i++) {
+            const r = Math.random() * 20;
+            const angle = i * 0.1;
+            
+            // Tọa độ đơn giản
+            const x = r * Math.cos(angle);
+            const y = (Math.random() - 0.5) * 5;
+            const z = r * Math.sin(angle);
+            positions.push(x, y, z);
 
-            // Polar coordinates to Cartesian
-            posArray[i] = (radius + scatter) * Math.cos(spin);             // X
-            posArray[i+1] = (Math.random() - 0.5) * 10;                    // Y (Height)
-            posArray[i+2] = (radius + scatter) * Math.sin(spin);           // Z
-
-            // Colors
-            const mixedColor = color1.clone().lerp(color2, Math.random());
-            colorArray[i] = mixedColor.r;
-            colorArray[i+1] = mixedColor.g;
-            colorArray[i+2] = mixedColor.b;
+            // Màu sắc
+            const mixed = color1.clone().lerp(color2, r / 20);
+            colors.push(mixed.r, mixed.g, mixed.b);
         }
 
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
         const material = new THREE.PointsMaterial({
-            size: 0.2, // Slightly larger particles
+            size: 0.3,
+            vertexColors: true,
+            sizeAttenuation: true // Hạt ở xa thì nhỏ lại
+        });
+
+        const mesh = new THREE.Points(geometry, material);
+        scene.add(mesh);
+
+        // Animation Loop đơn giản
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.y += 0.005; // Quay chậm thôi
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Xử lý resize màn hình
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
