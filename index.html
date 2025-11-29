@@ -1,75 +1,229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGL Advanced Flow Field</title>
+    <title>Quantum Tech - Future Landing Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- 1. CORE STYLES --- */
+        :root {
+            --primary: #00f2ff;
+            --secondary: #bd00ff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+        }
+
         body {
             margin: 0;
-            overflow: hidden;
-            background-color: #020207; /* Màu nền tối thẫm */
-            font-family: 'Montserrat', sans-serif;
+            background-color: #020207;
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden; /* Chặn cuộn ngang */
         }
+
+        /* --- 2. 3D BACKGROUND (QUAN TRỌNG) --- */
         canvas {
             display: block;
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 1;
+            position: fixed; /* Ghim chặt canvas vào màn hình */
+            top: 0;
+            left: 0;
+            z-index: -1; /* Đẩy xuống dưới cùng */
         }
-        /* HERO SECTION OVERLAY */
-        #hero-content {
-            position: absolute;
-            top: 50%;
-            left: 10%;
-            transform: translateY(-50%);
-            z-index: 10;
-            color: #fff;
-            pointer-events: none; /* Để chuột tương tác xuyên qua text xuống canvas */
+
+        /* --- 3. LAYOUT & TYPOGRAPHY --- */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
+
+        section {
+            padding: 100px 0;
+            min-height: 80vh; /* Mỗi section chiếm ít nhất 80% chiều cao màn hình */
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            margin: 0 0 20px 0;
+        }
+
         h1 {
             font-size: 4rem;
-            font-weight: 800;
-            margin: 0;
-            background: linear-gradient(45deg, #00f2ff, #0062ff);
+            line-height: 1.1;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+        }
+
+        h2 { font-size: 2.5rem; color: var(--primary); }
+        p { font-size: 1.1rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 30px; }
+
+        /* --- 4. NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            z-index: 100;
+            background: rgba(2, 2, 7, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { font-family: 'Orbitron'; font-weight: bold; font-size: 1.5rem; color: #fff; }
+        
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: -2px;
+            letter-spacing: 1px;
+            transition: 0.3s;
         }
-        p {
-            font-size: 1.2rem;
-            letter-spacing: 4px;
-            color: rgba(255,255,255,0.7);
-            margin-top: 10px;
+        .nav-links a:hover { color: var(--primary); }
+
+        /* --- 5. GLASS CARDS (Hiệu ứng kính) --- */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px); /* Làm mờ hậu cảnh sau card */
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 40px;
+            transition: transform 0.3s ease;
         }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 242, 255, 0.1);
+        }
+
+        /* --- 6. SECTIONS SPECIFIC --- */
+        /* Hero Section */
+        #hero { height: 100vh; }
+        .hero-content { max-width: 800px; }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transition: 0.3s;
+        }
+        .btn:hover { box-shadow: 0 0 40px rgba(0, 242, 255, 0.8); transform: scale(1.05); }
+
+        /* Features Section (Grid) */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 50px 0;
+            background: rgba(0,0,0,0.8);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
     </style>
 </head>
 <body>
 
-    <div id="hero-content">
-        <h1>Quantum Flow</h1>
-        <p>Interactive GPU Particle Field</p>
-    </div>
+    <nav>
+        <div class="container nav-content">
+            <div class="logo">QUANTUM.IO</div>
+            <div class="nav-links">
+                <a href="#hero">Home</a>
+                <a href="#about">About</a>
+                <a href="#features">Solutions</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>The Next Era of <br> Digital Experience</h1>
+                <p>Khám phá công nghệ tương tác dòng chảy hạt (Particle Flow) trên nền tảng WebGL. Tối ưu hóa hiệu năng, trải nghiệm mượt mà trên mọi thiết bị.</p>
+                <a href="#about" class="btn">Explore Now</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="glass-card">
+                <h2>Our Vision</h2>
+                <p>Chúng tôi không chỉ viết mã, chúng tôi tạo ra nghệ thuật số. Sử dụng sức mạnh của GPU để xử lý hàng ngàn tác vụ song song, mang lại trải nghiệm thị giác chưa từng có trên trình duyệt web.</p>
+                <p>Công nghệ Shader (GLSL) cho phép kiểm soát từng điểm ảnh, từng chuyển động nhỏ nhất, tạo ra sự sống động mà các thư viện UI truyền thống không thể làm được.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 50px;">Core Features</h2>
+            <div class="grid-3">
+                <div class="glass-card">
+                    <h3>High Performance</h3>
+                    <p>Sử dụng Three.js BufferGeometry và WebGL Renderer giúp đạt 60 FPS ngay cả trên thiết bị cấu hình thấp.</p>
+                </div>
+                <div class="glass-card">
+                    <h3>Interactive</h3>
+                    <p>Hệ thống phản hồi theo thời gian thực với vị trí chuột của người dùng, tạo cảm giác kết nối sâu sắc.</p>
+                </div>
+                <div class="glass-card">
+                    <h3>Creative Design</h3>
+                    <p>Phong cách thiết kế Cyberpunk kết hợp Glassmorphism tạo nên vẻ đẹp hiện đại và tương lai.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 Quantum Creative. Built with Three.js & GLSL.</p>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script type="x-shader/x-vertex" id="vertexShader">
         uniform float uTime;
         uniform vec2 uMouse;
-        uniform vec2 uResolution;
-        
-        attribute float aRandom; // Giá trị ngẫu nhiên riêng biệt cho mỗi hạt
+        attribute float aRandom;
+        varying vec3 vColor;
 
-        varying vec3 vColor; // Truyền màu sắc sang Fragment Shader
-
-        // --- Hàm Simplex Noise 3D (Ashima Arts) ---
-        // Đây là thuật toán tạo độ nhiễu, giúp các hạt di chuyển tự nhiên như dòng nước
+        // Simplex Noise Function
         vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
         vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
         float snoise(vec3 v) {
             const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;
             const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);
@@ -80,18 +234,18 @@
             vec3 i1 = min( g.xyz, l.zxy );
             vec3 i2 = max( g.xyz, l.zxy );
             vec3 x1 = x0 - i1 + C.xxx;
-            vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y
-            vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y
+            vec3 x2 = x0 - i2 + C.yyy;
+            vec3 x3 = x0 - D.yyy;
             i = mod289(i);
             vec4 p = permute( permute( permute(
                         i.z + vec4(0.0, i1.z, i2.z, 1.0 ))
                     + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))
                     + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));
-            float n_ = 0.142857142857; // 1.0/7.0
+            float n_ = 0.142857142857;
             vec3  ns = n_ * D.wyz - D.xzx;
-            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod7(p,p*p)
+            vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
             vec4 x_ = floor(j * ns.z);
-            vec4 y_ = floor(j - 7.0 * x_ );    // mod7(j,N)
+            vec4 y_ = floor(j - 7.0 * x_ );
             vec4 x = x_ *ns.x + ns.yyyy;
             vec4 y = y_ *ns.x + ns.yyyy;
             vec4 h = 1.0 - abs(x) - abs(y);
@@ -112,59 +266,37 @@
             m = m * m;
             return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3) ) );
         }
-        // --- Kết thúc hàm Noise ---
 
         void main() {
             vec3 pos = position;
-            float time = uTime * 0.15; // Tốc độ thời gian
-
-            // 1. Tạo chuyển động Flow Field bằng Noise
-            // Chúng ta lấy mẫu noise tại vị trí hiện tại, tạo ra một vector hướng di chuyển
+            float time = uTime * 0.15;
             float noiseX = snoise(vec3(pos.x * 0.02, pos.y * 0.02, time + aRandom));
             float noiseY = snoise(vec3(pos.x * 0.02, pos.y * 0.02, time + aRandom + 10.0));
-            
-            // Cộng vector noise vào vị trí để tạo chuyển động trôi
             pos.x += noiseX * 0.3;
             pos.y += noiseY * 0.3;
-
-            // 2. Hiệu ứng "Wrap Around" (Vòng lặp vô tận)
-            // Nếu hạt bay ra khỏi vùng nhìn, đưa nó quay lại phía bên kia
             float boundary = 40.0;
             pos.x = mod(pos.x + boundary, boundary * 2.0) - boundary;
             pos.y = mod(pos.y + boundary, boundary * 2.0) - boundary;
-
-            // 3. Tương tác chuột (Mouse Interaction Force)
-            // Chuyển đổi vị trí hạt sang không gian màn hình 2D để so sánh với chuột
-            vec4 screenPos = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-            vec2 ndcPos = screenPos.xy / screenPos.w; // Tọa độ thiết bị chuẩn hóa (-1 đến 1)
             
-            // Tính khoảng cách từ hạt đến chuột
+            // Mouse Interaction
+            vec4 screenPos = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+            vec2 ndcPos = screenPos.xy / screenPos.w;
             float dist = distance(ndcPos, uMouse);
-            float mouseRadius = 0.3; // Bán kính ảnh hưởng của chuột
-
-            // Nếu nằm trong bán kính ảnh hưởng, tạo lực đẩy
+            float mouseRadius = 0.3;
             if (dist < mouseRadius) {
-                // Vector hướng từ chuột đến hạt
                 vec2 dir = normalize(ndcPos - uMouse);
-                // Lực đẩy mạnh hơn khi ở gần tâm chuột
                 float force = (mouseRadius - dist) * 3.0;
-                // Áp dụng lực đẩy vào vị trí 3D (chủ yếu đẩy theo trục Z để tạo chiều sâu)
                 pos.x += dir.x * force * 2.0;
                 pos.y += dir.y * force * 2.0;
                 pos.z += force * 5.0; 
             }
 
-            // 4. Tính toán vị trí cuối cùng trên màn hình
             vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
             gl_Position = projectionMatrix * mvPosition;
-
-            // 5. Kích thước điểm ảnh hưởng bởi chiều sâu (càng xa càng nhỏ)
-            gl_PointSize = (10.0 * (1.0 + aRandom)) * (1.0 / -mvPosition.z);
-
-            // 6. Tạo màu sắc dựa trên vị trí và độ nhiễu
-            vec3 color1 = vec3(0.0, 0.8, 1.0); // Cyan
-            vec3 color2 = vec3(0.6, 0.0, 1.0); // Purple
-            // Trộn màu dựa trên vị trí X và một chút nhiễu
+            gl_PointSize = (8.0 * (1.0 + aRandom)) * (1.0 / -mvPosition.z);
+            
+            vec3 color1 = vec3(0.0, 0.8, 1.0); 
+            vec3 color2 = vec3(0.6, 0.0, 1.0); 
             float mixFactor = smoothstep(-20.0, 20.0, pos.x) + noiseX * 0.2;
             vColor = mix(color1, color2, mixFactor);
         }
@@ -172,76 +304,52 @@
 
     <script type="x-shader/x-fragment" id="fragmentShader">
         varying vec3 vColor;
-
         void main() {
-            // Tạo hình tròn mềm thay vì hình vuông mặc định
-            // Tính khoảng cách từ tâm điểm ảnh (0.5, 0.5)
             float dist = distance(gl_PointCoord, vec2(0.5));
-            
-            // Nếu xa tâm quá 0.5 thì loại bỏ (tạo viền tròn)
             if (dist > 0.5) discard;
-
-            // Tạo hiệu ứng phát sáng mềm (glow) từ tâm ra ngoài
             float alpha = 1.0 - smoothstep(0.3, 0.5, dist);
-
-            // Gán màu cuối cùng
-            gl_FragColor = vec4(vColor, alpha * 0.8); // Độ trong suốt 0.8
+            gl_FragColor = vec4(vColor, alpha * 0.8);
         }
     </script>
 
-
     <script>
-        // --- CẤU HÌNH HỆ THỐNG ---
-        const PARTICLE_COUNT = 15000; // Số lượng hạt (15 ngàn!)
+        const PARTICLE_COUNT = 15000;
+        let renderer, scene, camera, particleSystem, uniforms;
 
-        let renderer, scene, camera;
-        let particleSystem;
-        let uniforms; // Biến để truyền dữ liệu từ JS sang Shader
-
-        // --- 1. KHỞI TẠO (INIT) ---
         function init() {
-            // Renderer setup (Tối ưu cho máy cấu hình thấp)
+            // Renderer (giữ cấu hình Safe Mode cho Ubuntu của bạn)
             renderer = new THREE.WebGLRenderer({ 
-                antialias: false, // Tắt khử răng cưa để tối ưu hiệu năng
+                antialias: false, 
                 powerPreference: "high-performance",
                 failIfMajorPerformanceCaveat: false 
             });
             renderer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            // Sử dụng AdditiveBlending để tạo hiệu ứng phát sáng khi các hạt chồng lên nhau
-            renderer.setClearColor(0x020207, 1); 
+            renderer.setClearColor(0x000000, 0); // Quan trọng: Màu nền trong suốt để thấy body color
             document.body.appendChild(renderer.domElement);
 
-            // Scene & Camera setup
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.z = 50;
 
-            // --- TẠO HẠT (BUFFER GEOMETRY) ---
             const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(PARTICLE_COUNT * 3); // x, y, z
-            const randoms = new Float32Array(PARTICLE_COUNT); // Giá trị ngẫu nhiên riêng
+            const positions = new Float32Array(PARTICLE_COUNT * 3);
+            const randoms = new Float32Array(PARTICLE_COUNT);
 
-            // Phân bố hạt ngẫu nhiên trong không gian
             for (let i = 0; i < PARTICLE_COUNT; i++) {
                 const i3 = i * 3;
-                // Rải hạt trong một vùng không gian rộng
-                positions[i3] = (Math.random() - 0.5) * 80;     // X
-                positions[i3 + 1] = (Math.random() - 0.5) * 80; // Y
-                positions[i3 + 2] = (Math.random() - 0.5) * 50; // Z
-                
-                randoms[i] = Math.random(); // Giá trị ngẫu nhiên từ 0-1
+                positions[i3] = (Math.random() - 0.5) * 80;
+                positions[i3 + 1] = (Math.random() - 0.5) * 80;
+                positions[i3 + 2] = (Math.random() - 0.5) * 50;
+                randoms[i] = Math.random();
             }
 
-            // Gắn dữ liệu vào geometry để gửi xuống GPU
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
 
-            // --- TẠO MATERIAL (SHADER MATERIAL) ---
-            // Đây là cầu nối giữa Javascript và chương trình GLSL
             uniforms = {
                 uTime: { value: 0 },
-                uMouse: { value: new THREE.Vector2(9999, 9999) }, // Chuột ban đầu ở rất xa
+                uMouse: { value: new THREE.Vector2(9999, 9999) },
                 uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
             };
 
@@ -250,55 +358,16 @@
                 fragmentShader: document.getElementById('fragmentShader').textContent,
                 uniforms: uniforms,
                 transparent: true,
-                blending: THREE.AdditiveBlending, // Quan trọng cho hiệu ứng phát sáng
-                depthWrite: false // Tắt ghi đè chiều sâu để các hạt trong suốt không che nhau
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
             });
 
-            // Tạo hệ thống hạt và thêm vào scene
             particleSystem = new THREE.Points(geometry, material);
             scene.add(particleSystem);
 
-            // Gắn sự kiện
             window.addEventListener('resize', onWindowResize, false);
             document.addEventListener('mousemove', onMouseMove, false);
         }
 
-        // --- 2. XỬ LÝ SỰ KIỆN (EVENT LISTENERS) ---
         function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            // Cập nhật độ phân giải cho shader
-            uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
-        }
-
-        function onMouseMove(event) {
-            // Chuẩn hóa tọa độ chuột về khoảng -1 đến 1 (NDC space) để shader dễ tính toán
-            uniforms.uMouse.value.x = (event.clientX / window.innerWidth) * 2 - 1;
-            uniforms.uMouse.value.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        }
-
-        // --- 3. VÒNG LẶP RENDER (ANIMATION LOOP) ---
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Cập nhật thời gian gửi xuống GPU
-            const elapsedTime = clock.getElapsedTime();
-            uniforms.uTime.value = elapsedTime;
-            
-            // Xoay nhẹ toàn bộ hệ thống để tăng cảm giác không gian 3D
-            particleSystem.rotation.y = elapsedTime * 0.05;
-            particleSystem.rotation.z = elapsedTime * 0.02;
-
-            renderer.render(scene, camera);
-        }
-
-        // --- KHỞI CHẠY ---
-        init();
-        animate();
-
-    </script>
-</body>
-</html>
+            camera.aspect
